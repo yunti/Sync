@@ -3,6 +3,7 @@ build/
 npm-debug.log
 dist/
 .cache/
+.parcel-cache/
 
 .vscode/
 .idea/
