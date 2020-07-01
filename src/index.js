@@ -15,7 +15,16 @@ function render(element, container) {
       : document.createElement(element.type)
   if (element.props) {
     element.props.children.forEach(child => render(child, dom))
+
+    // Set properties on DOM Element
+    const isProperty = key => key !== 'children'
+    Object.keys(element.props)
+      .filter(isProperty)
+      .forEach(name => {
+        dom[name] = element.props[name]
+      })
   }
+
   container.appendChild(dom)
 }
 
@@ -23,10 +32,5 @@ const Sync = {
   render,
 }
 const container = document.getElementById('root')
-// const node = document.createElement('h1')
-// node['title'] = 'foo'
-// const text = document.createTextNode('Hello World')
-// // text['nodeValue'] = 'Hello World'
-// node.appendChild(text)
-// container.appendChild(node)
+
 Sync.render(element, container)
