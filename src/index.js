@@ -1,6 +1,9 @@
 'use strict'
 
-import Sync from './sync'
-// import { render } from "react-dom";
-
-render(<h1>Hello World</h1>, document.getElementById('root'))
+const container = document.getElementById('root')
+const node = document.createElement('h1')
+node['title'] = 'foo'
+const text = document.createTextNode('')
+text['nodeValue'] = 'Hello World'
+node.appendChild(text)
+container.appendChild(node)
