@@ -45,10 +45,12 @@ const Sync = {
   render,
 }
 
-const textElement = Sync.createElement('TEXT_ELEMENT', {
-  nodeValue: 'Hello World',
-})
-const element = Sync.createElement('h1', { title: 'foo' }, textElement)
+/** @jsx Sync.createElement */
+const element = <h1 title="foo">Hello World</h1>
+// const textElement = Sync.createElement('TEXT_ELEMENT', {
+//   nodeValue: 'Hello World',
+// })
+// const element = Sync.createElement('h1', { title: 'foo' }, textElement)
 const container = document.getElementById('root')
 
 Sync.render(element, container)
