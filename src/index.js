@@ -3,7 +3,20 @@
 import Sync from './sync'
 
 /** @jsx Sync.createElement */
-const element = <h1 title="foo">Hello World</h1>
 
 const container = document.getElementById('root')
-Sync.render(element, container)
+
+const updateValue = e => {
+  rerender(e.target.value)
+}
+
+const rerender = value => {
+  const element = (
+    <div>
+      <input onInput={updateValue} value={value} />
+      <h2>Hello {value}</h2>
+    </div>
+  )
+  Sync.render(element, container)
+}
+rerender('World')
