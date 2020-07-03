@@ -1,4 +1,4 @@
-'use strict'
+"use strict"
 
 function createElement(type, props, ...children) {
   return {
@@ -6,7 +6,7 @@ function createElement(type, props, ...children) {
     props: {
       ...props,
       children: children.map(child =>
-        typeof child === 'object' ? child : createTextElement(child),
+        typeof child === "object" ? child : createTextElement(child),
       ),
     },
   }
@@ -14,7 +14,7 @@ function createElement(type, props, ...children) {
 
 function createTextElement(text) {
   return {
-    type: 'TEXT_ELEMENT',
+    type: "TEXT_ELEMENT",
     props: {
       nodeValue: text,
       children: [],
@@ -24,8 +24,8 @@ function createTextElement(text) {
 
 function createDom(fiber) {
   const dom =
-    fiber.type === 'TEXT_ELEMENT'
-      ? document.createTextNode('')
+    fiber.type === "TEXT_ELEMENT"
+      ? document.createTextNode("")
       : document.createElement(fiber.type)
 
   updateDom(dom, {}, fiber.props)
@@ -33,8 +33,8 @@ function createDom(fiber) {
   return dom
 }
 
-const isEvent = key => key.startsWith('on')
-const isProperty = key => key !== 'children' && !isEvent(key)
+const isEvent = key => key.startsWith("on")
+const isProperty = key => key !== "children" && !isEvent(key)
 const isNew = (prev, next) => key => prev[key] !== next[key]
 const isGone = (prev, next) => key => !(key in next)
 function updateDom(dom, prevProps, nextProps) {
@@ -51,7 +51,7 @@ function updateDom(dom, prevProps, nextProps) {
     .filter(isProperty)
     .filter(isGone(prevProps, nextProps))
     .forEach(name => {
-      dom[name] = ''
+      dom[name] = ""
     })
 
   // Set new or changed properties
@@ -88,13 +88,13 @@ function commitWork(fiber) {
   while (!domParentFiber.dom) {
     domParentFiber = domParentFiber.parent
   }
-  const domParent = domParentFiber.dom;
+  const domParent = domParentFiber.dom
 
-  if (fiber.effectTag === 'PLACEMENT' && fiber.dom != null) {
+  if (fiber.effectTag === "PLACEMENT" && fiber.dom != null) {
     domParent.appendChild(fiber.dom)
-  } else if (fiber.effectTag === 'UPDATE' && fiber.dom != null) {
+  } else if (fiber.effectTag === "UPDATE" && fiber.dom != null) {
     updateDom(fiber.dom, fiber.alternate.props, fiber.props)
-  } else if (fiber.effectTag === 'DELETION') {
+  } else if (fiber.effectTag === "DELETION") {
     commitDeletion(fiber, domParent)
   }
 
@@ -164,9 +164,46 @@ function performUnitOfWork(fiber) {
   }
 }
 
+let wipFiber = null
+let hookIndex = null
+
 function updateFunctionComponent(fiber) {
+  wipFiber = fiber
+  hookIndex = 0
+  wipFiber.hooks = []
   const children = [fiber.type(fiber.props)]
   reconcileChildren(fiber, children)
+}
+
+function useState(initial) {
+  const oldHook =
+    wipFiber.alternate &&
+    wipFiber.alternate.hooks &&
+    wipFiber.alternate.hooks[hookIndex]
+  const hook = {
+    state: oldHook ? oldHook.state : initial,
+    queue: [],
+  }
+
+  const actions = oldHook ? oldHook.queue : []
+  actions.forEach(action => {
+    hook.state = action(hook.state)
+  })
+
+  const setState = action => {
+    hook.queue.push(action)
+    wipRoot = {
+      dom: currentRoot.dom,
+      props: currentRoot.props,
+      alternate: currentRoot,
+    }
+    nextUnitOfWork = wipRoot
+    deletions = []
+  }
+
+  wipFiber.hooks.push(hook)
+  hookIndex++
+  return [hook.state, setState]
 }
 
 function updateHostComponent(fiber) {
@@ -195,7 +232,7 @@ function reconcileChildren(wipFiber, elements) {
         dom: oldFiber.dom,
         parent: wipFiber,
         alternate: oldFiber,
-        effectTag: 'UPDATE',
+        effectTag: "UPDATE",
       }
     }
     if (element && !sameType) {
@@ -206,11 +243,11 @@ function reconcileChildren(wipFiber, elements) {
         dom: null,
         parent: wipFiber,
         alternate: null,
-        effectTag: 'PLACEMENT',
+        effectTag: "PLACEMENT",
       }
     }
     if (oldFiber && !sameType) {
-      oldFiber.effectTag = 'DELETION'
+      oldFiber.effectTag = "DELETION"
       deletions.push(oldFiber)
     }
 
@@ -230,6 +267,7 @@ function reconcileChildren(wipFiber, elements) {
 const Sync = {
   createElement,
   render,
+  useState,
 }
 
 export default Sync
