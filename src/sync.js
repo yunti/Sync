@@ -236,7 +236,7 @@ function reconcileChildren(wipFiber, elements) {
       }
     }
     if (element && !sameType) {
-      // TODO add this node
+      // Add this node
       newFiber = {
         type: element.type,
         props: element.props,
