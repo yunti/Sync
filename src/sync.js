@@ -1,5 +1,3 @@
-"use strict"
-
 function createElement(type, props, ...children) {
   return {
     type,
@@ -111,6 +109,7 @@ function commitDeletion(fiber, domParent) {
 }
 
 function render(element, container) {
+  // Creates the root fiber and sets it as the next unit of work
   wipRoot = {
     dom: container,
     props: {
@@ -175,37 +174,6 @@ function updateFunctionComponent(fiber) {
   reconcileChildren(fiber, children)
 }
 
-function useState(initial) {
-  const oldHook =
-    wipFiber.alternate &&
-    wipFiber.alternate.hooks &&
-    wipFiber.alternate.hooks[hookIndex]
-  const hook = {
-    state: oldHook ? oldHook.state : initial,
-    queue: [],
-  }
-
-  const actions = oldHook ? oldHook.queue : []
-  actions.forEach(action => {
-    hook.state = action(hook.state)
-  })
-
-  const setState = action => {
-    hook.queue.push(action)
-    wipRoot = {
-      dom: currentRoot.dom,
-      props: currentRoot.props,
-      alternate: currentRoot,
-    }
-    nextUnitOfWork = wipRoot
-    deletions = []
-  }
-
-  wipFiber.hooks.push(hook)
-  hookIndex++
-  return [hook.state, setState]
-}
-
 function updateHostComponent(fiber) {
   if (!fiber.dom) {
     fiber.dom = createDom(fiber)
@@ -214,6 +182,8 @@ function updateHostComponent(fiber) {
 }
 
 function reconcileChildren(wipFiber, elements) {
+  // compares the oldFiber (what we previously rendered)
+  // with the element (what we want to render)
   let index = 0
   let oldFiber = wipFiber.alternate && wipFiber.alternate.child
   let prevSibling = null
@@ -264,10 +234,46 @@ function reconcileChildren(wipFiber, elements) {
   }
 }
 
+function useState(initial) {
+  const oldHook =
+    wipFiber.alternate &&
+    wipFiber.alternate.hooks &&
+    wipFiber.alternate.hooks[hookIndex]
+  const hook = {
+    state: oldHook ? oldHook.state : initial,
+    queue: [],
+  }
+
+  const actions = oldHook ? oldHook.queue : []
+  actions.forEach(action => {
+    hook.state = action(hook.state)
+  })
+
+  const setState = action => {
+    hook.queue.push(action)
+    wipRoot = {
+      dom: currentRoot.dom,
+      props: currentRoot.props,
+      alternate: currentRoot,
+    }
+    nextUnitOfWork = wipRoot
+    deletions = []
+  }
+
+  wipFiber.hooks.push(hook)
+  hookIndex++
+  return [hook.state, setState]
+}
+
+function useEffect() {
+  // TODO
+}
+
 const Sync = {
   createElement,
   render,
   useState,
+  useEffect,
 }
 
 export default Sync

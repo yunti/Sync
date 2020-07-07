@@ -1,6 +1,6 @@
-'use strict'
+"use strict"
 
-import Sync from './sync'
+import Sync from "./sync"
 
 /** @jsx Sync.createElement */
 function Counter() {
@@ -8,5 +8,5 @@ function Counter() {
   return <h1 onClick={() => setState(c => c + 1)}>Count: {state}</h1>
 }
 const element = <Counter name="foo" />
-const container = document.getElementById('root')
+const container = document.getElementById("root")
 Sync.render(element, container)
