@@ -118,6 +118,7 @@ function render(element, container) {
     alternate: currentRoot,
   }
   deletions = []
+  // start the work at the root.
   nextUnitOfWork = wipRoot
 }
 
@@ -156,6 +157,8 @@ function performUnitOfWork(fiber) {
   }
   let nextFiber = fiber
   while (nextFiber) {
+    // recurse up through parents until you find a sibling
+    // until no more and the unit of work is finished.
     if (nextFiber.sibling) {
       return nextFiber.sibling
     }
