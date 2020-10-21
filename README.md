@@ -1,6 +1,6 @@
 ![Screenshot](sync.png)
 
-# Sync
+# aSync
 
 ## An async React compatible display framework 
 
